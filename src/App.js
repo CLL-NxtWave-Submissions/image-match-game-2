@@ -277,11 +277,104 @@ const GameHeader = props => {
   )
 }
 
+// ThumbnailImage component
+const ThumbnailImage = props => {
+  const {
+    imageData,
+    expectedIdOfSelectedImage,
+    scoreUpdateHandler,
+    endGameHandler,
+  } = props
+
+  const onImageSelection = () => {
+    const isCorrectImageSelection = imageData.id === expectedIdOfSelectedImage
+
+    if (isCorrectImageSelection) {
+      scoreUpdateHandler()
+    } else {
+      endGameHandler()
+    }
+  }
+
+  return (
+    <li key={imageData.id} onClick={onImageSelection}>
+      <img
+        className="thumbnail-image"
+        src={imageData.thumbnailUrl}
+        alt="thumbnail"
+      />
+    </li>
+  )
+}
+
 // GameArea Component
 const GameArea = props => {
-  const {matchImageUrl, imageDataList, imageSelectionHandler} = props
+  const {
+    matchImageId,
+    imageDataList,
+    imageCategoryTabSelectionHandler,
+    updateScoreOnImageSelectionHandler,
+    endGameOnImageSelectionHandler,
+    selectedTabId,
+  } = props
 
-  return <div className="game-area-bg-container"></div>
+  const getMatchImageData = idOfMatchImage =>
+    imageDataList.find(
+      imageDataListItem => imageDataListItem.id === idOfMatchImage,
+    )
+
+  const getImageDataForSelectedCategoryTab = imgCategoryTabId => {
+    const filteredImageData = imageDataList.filter(
+      imageDataListItem => imageDataListItem.category === imgCategoryTabId,
+    )
+    return filteredImageData
+  }
+
+  const imageDataForSelectedCategoryTab = getImageDataForSelectedCategoryTab(
+    selectedTabId,
+  )
+
+  const matchImageData = getMatchImageData(matchImageId)
+
+  return (
+    <div className="game-area-bg-container">
+      <img
+        className="game-area-match-image"
+        src={matchImageData.imageUrl}
+        alt="match"
+      />
+      <ul className="game-area-img-category-list">
+        {tabsList.map(tabsListItem => {
+          const isSelected = tabsListItem.tabId === selectedTabId
+
+          return (
+            <li key={tabsListItem.tabId}>
+              <button
+                type="button"
+                className={`game-area-img-category ${
+                  isSelected && 'selected-img-category'
+                }`}
+                onClick={imageCategoryTabSelectionHandler}
+              >
+                {tabsListItem.displayText}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+
+      <ul className="thumbnail-images-list">
+        {imageDataForSelectedCategoryTab.map(singleImageData => (
+          <ThumbnailImage
+            imageData={singleImageData}
+            expectedIdOfSelectedImage={matchImageId}
+            scoreUpdateHandler={updateScoreOnImageSelectionHandler}
+            endGameHandler={endGameOnImageSelectionHandler}
+          />
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 // MatchGame class component
