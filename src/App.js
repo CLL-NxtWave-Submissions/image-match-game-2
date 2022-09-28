@@ -1,3 +1,4 @@
+import {Component} from 'react'
 import './App.css'
 
 // These are the lists used in the application. You can move them to any component needed.
@@ -246,7 +247,111 @@ const imagesList = [
   },
 ]
 
-// Replace your code here
-const App = () => <div>Hello World</div>
+// GameHeader component
+const GameHeader = props => {
+  const {gameScore, gameTime} = props
+
+  return (
+    <nav className="game-header-bg-container">
+      <img
+        className="game-brand-img"
+        src="https://assets.ccbp.in/frontend/react-js/match-game-website-logo.png"
+        alt="website logo"
+      />
+      <div className="game-header-content-container">
+        <div className="game-attribute-container">
+          <p className="game-attribute-name">Score: </p>
+          <p className="game-attribute-value">{gameScore}</p>
+        </div>
+
+        <div className="game-attribute-container">
+          <img
+            className="game-attribute-img"
+            src="https://assets.ccbp.in/frontend/react-js/match-game-timer-img.png"
+            alt="timer"
+          />
+          <p className="game-attribute-value">{gameTime} secs</p>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+// GameArea Component
+const GameArea = props => {
+  const {matchImageUrl, imageDataList, imageSelectionHandler} = props
+
+  return <div className="game-area-bg-container"></div>
+}
+
+// MatchGame class component
+class MatchGame extends Component {
+  state = {
+    score: 0,
+    secondsLeft: 60,
+    isGameInProgress: true,
+    timerIntervalId: null,
+    toBeMatchedImageId: imagesList[0].id,
+  }
+
+  componentDidMount() {
+    this.startGame()
+  }
+
+  decrementTimer = () => {
+    this.setState(previousMatchGameState => {
+      const {secondsLeft, timerIntervalId} = previousMatchGameState
+
+      if (secondsLeft === 0) {
+        clearInterval(timerIntervalId)
+
+        return {
+          isGameInProgress: false,
+          timerIntervalId: null,
+        }
+      }
+
+      return {
+        secondsLeft: secondsLeft - 1,
+      }
+    })
+  }
+
+  startGame = () => {
+    const decrementTimerIntervalId = setInterval(this.decrementTimer, 1000)
+
+    this.setState({
+      score: 0,
+      secondsLeft: 60,
+      isGameInProgress: true,
+      timerIntervalId: decrementTimerIntervalId,
+    })
+  }
+
+  endGame = () => {
+    this.setState(previousMatchGameState => {
+      const {timerIntervalId} = previousMatchGameState
+      clearInterval(timerIntervalId)
+
+      return {
+        timerIntervalId: null,
+        isGameInProgress: false,
+      }
+    })
+  }
+
+  render() {
+    const {score, secondsLeft, isGameInProgress} = this.state
+
+    return (
+      <div className="match-game-bg-container">
+        <GameHeader gameScore={score} gameTime={secondsLeft} />
+      </div>
+    )
+  }
+}
+
+// Higher level App component, composed of child components
+const App = () => <MatchGame />
 
 export default App
