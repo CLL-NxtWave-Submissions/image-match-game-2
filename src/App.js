@@ -292,6 +292,7 @@ class MatchGame extends Component {
     isGameInProgress: true,
     timerIntervalId: null,
     toBeMatchedImageId: imagesList[0].id,
+    selectedImageCategoryTabId: 'FRUIT',
   }
 
   componentDidMount() {
